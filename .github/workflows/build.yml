@@ -9,27 +9,47 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          
+          python-version: "3.11"
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x'
-          channel: 'stable'
+          flutter-version: "3.22.x"
+          channel: "stable"
 
       - name: Install dependencies
-        run: pip install flet
-          
-      - name: Build APK
-        run: flet build apk --yes
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet
 
-      - name: Upload APK
+      - name: Build APK
+        run: |
+          flet --version
+          flutter --version
+          flet build apk --yes
+
+      - name: Debug: locate APKs
+        if: always()
+        run: |
+          echo "PWD=$(pwd)"
+          echo "Searching for APK files..."
+          find . -type f \( -iname "*.apk" -o -iname "*.aab" \) -print
+
+          echo "Show common output dirs:"
+          ls -la || true
+          ls -la build || true
+          ls -la dist || true
+          ls -la out || true
+
+      - name: Upload APK/AAB (auto)
         uses: actions/upload-artifact@v4
         with:
-          name: app-apk
-          path: build/apk/app-release.apk  # مسیر استاندارد فلت برای اندروید
-          if-no-files-found: warn # اگر پیدا نکرد خطا نده، فقط هشدار بده
+          name: android-build
+          path: |
+            **/*.apk
+            **/*.aab
+          if-no-files-found: error
