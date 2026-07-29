@@ -27,29 +27,10 @@ jobs:
           pip install flet
 
       - name: Build APK
-        run: |
-          flet --version
-          flutter --version
-          flet build apk --yes
+        run: flet build apk --yes
 
-      - name: Debug: locate APKs
-        if: always()
-        run: |
-          echo "PWD=$(pwd)"
-          echo "Searching for APK files..."
-          find . -type f \( -iname "*.apk" -o -iname "*.aab" \) -print
-
-          echo "Show common output dirs:"
-          ls -la || true
-          ls -la build || true
-          ls -la dist || true
-          ls -la out || true
-
-      - name: Upload APK/AAB (auto)
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-build
-          path: |
-            **/*.apk
-            **/*.aab
-          if-no-files-found: error
+          path: build/apk/app-release.apk
