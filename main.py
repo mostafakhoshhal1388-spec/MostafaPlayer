@@ -2,6 +2,13 @@ import flet as ft
 import os
 
 
+def safe_icon(name: str, fallback: str = "MUSIC_NOTE"):
+    icons_obj = ft.icons
+    if hasattr(icons_obj, name):
+        return getattr(icons_obj, name)
+    return getattr(icons_obj, fallback)
+
+
 def create_audio():
     audio_cls = getattr(ft, "Audio", None)
     if audio_cls is None:
@@ -17,7 +24,6 @@ def main(page: ft.Page):
     page.title = "MostafaPlayer"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 16
-    page.scroll = ft.ScrollMode.AUTO
 
     playlist = []
     current_index = -1
@@ -40,14 +46,14 @@ def main(page: ft.Page):
         page.overlay.append(audio)
     else:
         status_text.value = "پخش صدا در این نسخه Flet در دسترس نیست."
-    
+
     def update_playlist_view():
         playlist_view.controls.clear()
         for i, song_path in enumerate(playlist):
             song_name = os.path.basename(song_path)
             playlist_view.controls.append(
                 ft.ListTile(
-                    leading=ft.Icon(ft.icons.MUSIC_NOTE),
+                    leading=ft.Icon(safe_icon("MUSIC_NOTE")),
                     title=ft.Text(song_name),
                     on_click=lambda e, idx=i: play_song(idx),
                 )
@@ -105,11 +111,12 @@ def main(page: ft.Page):
         except Exception as ex:
             show_message(f"خطا در تنظیم صدا: {ex}")
 
-    def on_files_picked(e: ft.FilePickerResultEvent):
+    def on_files_picked(e):
         playlist.clear()
 
-        if e.files:
-            for file in e.files:
+        files = getattr(e, "files", None)
+        if files:
+            for file in files:
                 file_path = getattr(file, "path", None)
                 file_name = getattr(file, "name", "")
 
@@ -125,7 +132,6 @@ def main(page: ft.Page):
 
         page.update()
 
-    # اصلاح خطای نمونه‌سازی FilePicker
     picker = ft.FilePicker()
     picker.on_result = on_files_picked
     page.overlay.append(picker)
@@ -136,7 +142,7 @@ def main(page: ft.Page):
                 ft.Text("MostafaPlayer", size=26, weight=ft.FontWeight.BOLD),
                 ft.ElevatedButton(
                     "انتخاب آهنگ‌ها",
-                    icon=ft.icons.AUDIO_FILE,
+                    icon=safe_icon("AUDIO_FILE"),
                     on_click=lambda e: picker.pick_files(
                         allow_multiple=True,
                         allowed_extensions=["mp3"],
@@ -160,13 +166,13 @@ def main(page: ft.Page):
                 ),
                 ft.Row(
                     [
-                        ft.IconButton(ft.icons.SKIP_PREVIOUS, on_click=prev_song),
+                        ft.IconButton(safe_icon("SKIP_PREVIOUS"), on_click=prev_song),
                         ft.IconButton(
-                            ft.icons.PLAY_ARROW,
+                            safe_icon("PLAY_ARROW"),
                             on_click=lambda e: play_song(current_index if current_index != -1 else 0),
                         ),
-                        ft.IconButton(ft.icons.PAUSE, on_click=pause_song),
-                        ft.IconButton(ft.icons.SKIP_NEXT, on_click=next_song),
+                        ft.IconButton(safe_icon("PAUSE"), on_click=pause_song),
+                        ft.IconButton(safe_icon("SKIP_NEXT"), on_click=next_song),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),
