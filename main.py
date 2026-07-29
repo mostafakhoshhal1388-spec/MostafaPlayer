@@ -1,4 +1,5 @@
 import flet as ft
+from flet.audio import Audio  # اصلاح: Import صحیح برای Audio
 import os
 
 def main(page: ft.Page):
@@ -9,8 +10,9 @@ def main(page: ft.Page):
     # متغیرهای وضعیت
     playlist = []
     current_index = 0
-    # اصلاح: قرار دادن مقدار "/" برای جلوگیری از خطا
-    audio = ft.Audio(src="/", autoplay=False)
+    
+    # اصلاح: استفاده از کلاس Audio که جداگانه ایمپورت شده
+    audio = Audio(src="/", autoplay=False)
     page.overlay.append(audio)
 
     # المان‌های رابط کاربری
@@ -35,7 +37,7 @@ def main(page: ft.Page):
             playlist_view.controls.clear()
             # لیست کردن فایل‌ها
             for file in os.listdir(e.path):
-                if file.lower().endswith(".mp3"): # استفاده از lower برای شناسایی بهتر فرمت‌ها
+                if file.lower().endswith(".mp3"):
                     full_path = os.path.join(e.path, file)
                     playlist.append(full_path)
                     playlist_view.controls.append(ft.ListTile(
@@ -57,8 +59,11 @@ def main(page: ft.Page):
             status_text,
             ft.Divider(),
             ft.Container(content=playlist_view, height=300),
-            # اصلاح جزئی برای اسلایدر صدا که در فلت روی صدا تاثیر می‌گذارد
-            ft.Slider(min=0, max=1, divisions=10, label="حجم صدا", on_change=lambda e: audio.set_volume(float(e.control.value))),
+            
+            # اصلاح: استفاده از ویژگی volume به جای متد set_volume
+            ft.Slider(min=0, max=1, divisions=10, label="حجم صدا", 
+                      on_change=lambda e: setattr(audio, 'volume', float(e.control.value))),
+            
             ft.Row([
                 ft.IconButton(ft.icons.SKIP_PREVIOUS, on_click=lambda _: play_song(current_index - 1)),
                 ft.IconButton(ft.icons.PLAY_ARROW, on_click=lambda _: audio.play()),
