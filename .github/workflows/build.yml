@@ -1,11 +1,11 @@
-name: Build Flet APK
+name: Build Flet APK & Windows
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install flet
 
+      # ساخت نسخه کامل اندروید برای تمام معماری‌ها (Universal APK)
       - name: Build APK
         run: flet build apk --yes --verbose
 
