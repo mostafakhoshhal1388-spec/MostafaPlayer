@@ -22,15 +22,14 @@ jobs:
           channel: 'stable'
 
       - name: Install dependencies
-        run: |
-          pip install flet
+        run: pip install flet
           
       - name: Build APK
-        run: |
-          flet build apk --yes
+        run: flet build apk --yes
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
-          path: build/apk/app-release.apk
+          path: build/apk/app-release.apk  # مسیر استاندارد فلت برای اندروید
+          if-no-files-found: warn # اگر پیدا نکرد خطا نده، فقط هشدار بده
