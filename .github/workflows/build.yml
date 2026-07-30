@@ -40,9 +40,9 @@ jobs:
         run: |
           flet --version
 
-      - name: Build APK
+      - name: Build APK (non-interactive)
         run: |
-          flet build apk
+          yes | flet build apk
 
       - name: Find APK files
         if: always()
