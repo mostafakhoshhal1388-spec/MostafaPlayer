@@ -13,7 +13,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -36,25 +36,14 @@ jobs:
           pip install -r requirements.txt
           pip install flet-cli
 
-      - name: Show versions
-        run: |
-          python --version
-          pip --version
-          flet --version
-          java -version
-
       - name: Build APK
         run: |
-          yes | flet build apk
-
-      - name: Find APK files
-        if: always()
-        run: |
-          find . -type f -name "*.apk"
+          # استفاده از پایتون 3.12 برای جلوگیری از خطای watchdog در نسخه 3.14
+          yes | flet build apk --python-version 3.12
 
       - name: Upload APK artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: MostafaPlayer-APK
-          path: "**/*.apk"
+          path: "build/apk/*.apk"
