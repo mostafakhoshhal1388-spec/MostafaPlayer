@@ -24,14 +24,13 @@ def main(page: ft.Page):
     playlist_view = ft.ListView(expand=True, spacing=6)
 
     def show_message(message: str):
+        # سازگاری با نسخه‌های خیلی قدیمی
         try:
             page.snack_bar = ft.SnackBar(ft.Text(message))
             page.snack_bar.open = True
-            page.update()
         except Exception:
-            # اگر SnackBar هم در نسخه خیلی قدیمی فرق داشت
             status_text.value = message
-            page.update()
+        page.update()
 
     if audio is not None:
         page.overlay.append(audio)
@@ -62,11 +61,11 @@ def main(page: ft.Page):
 
         try:
             audio.src = song_path
-            status_text.value = f"در حال پخش: {os.path.basename(song_path)}"
+            status_text.value = "در حال پخش: " + os.path.basename(song_path)
             page.update()
             audio.play()
         except Exception as ex:
-            show_message(f"خطا در پخش: {ex}")
+            show_message("خطا در پخش: " + str(ex))
 
     def pause_song(e=None):
         if audio is None:
@@ -74,7 +73,7 @@ def main(page: ft.Page):
         try:
             audio.pause()
         except Exception as ex:
-            show_message(f"خطا در توقف: {ex}")
+            show_message("خطا در توقف: " + str(ex))
 
     def next_song(e=None):
         if not playlist:
@@ -113,12 +112,11 @@ def main(page: ft.Page):
         update_playlist_view()
 
         if playlist:
-            status_text.value = f"{len(playlist)} آهنگ انتخاب شد. روی اسمش بزن تا پخش شود."
+            status_text.value = str(len(playlist)) + " آهنگ انتخاب شد. روی اسمش بزن."
         else:
             status_text.value = "هیچ فایل MP3 انتخاب نشد."
         page.update()
 
-    # FilePicker سازگار با نسخه‌های قدیمی
     picker = ft.FilePicker()
     picker.on_result = on_files_picked
     page.overlay.append(picker)
@@ -140,7 +138,6 @@ def main(page: ft.Page):
                     content=playlist_view,
                     height=320,
                     padding=8,
-                    border=ft.border.all(1, ft.colors.GREY_400),
                 ),
                 ft.Text("حجم صدا"),
                 ft.Slider(min=0, max=1, divisions=10, value=0.8, on_change=set_volume),
