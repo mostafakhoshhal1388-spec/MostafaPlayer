@@ -31,12 +31,17 @@ jobs:
           distribution: "zulu"
           java-version: "17"
 
-      - name: Accept Android SDK licenses
+      # --- مراحل جدید برای نصب و تنظیم Android SDK ---
+      - name: Install Android SDK
         run: |
-          yes | sdkmanager --licenses
+          mkdir -p $HOME/android/sdk
+          echo "y" | sudo /opt/hostedtoolcache/AndroidSDK/cmdline-tools/latest/bin/sdkmanager --install "cmdline-tools;latest"
+          echo "y" | sudo $HOME/android/sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "build-tools;34.0.0"
+          echo "y" | sudo $HOME/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        env:
+          ANDROID_SDK_ROOT: $HOME/android/sdk
+          PATH: ${{ env.PATH }}:/opt/hostedtoolcache/AndroidSDK/cmdline-tools/latest/bin:$HOME/android/sdk/platform-tools
 
-      # نکته مهم: اینجا پایتون بیلد را 3.11 قفل می‌کنیم
-      # تا مشکل watchdog روی python 3.14 پیش نیاید.
       - name: Build APK
         run: |
           flet build apk --python-version 3.11 --yes --verbose
