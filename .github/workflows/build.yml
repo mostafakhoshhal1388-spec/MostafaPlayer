@@ -40,7 +40,7 @@ jobs:
         run: |
           flet --version
 
-      - name: Build APK (non-interactive)
+      - name: Build APK
         run: |
           yes | flet build apk
 
