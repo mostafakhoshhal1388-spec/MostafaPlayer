@@ -3,9 +3,9 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-android:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -23,7 +23,7 @@ jobs:
       - name: Install Flet CLI
         run: |
           python -m pip install --upgrade pip
-          pip install "flet-cli"
+          pip install flet-cli
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -31,16 +31,11 @@ jobs:
           distribution: "zulu"
           java-version: "17"
 
-      # --- مراحل جدید برای نصب و تنظیم Android SDK ---
-      - name: Install Android SDK
-        run: |
-          mkdir -p $HOME/android/sdk
-          echo "y" | sudo /opt/hostedtoolcache/AndroidSDK/cmdline-tools/latest/bin/sdkmanager --install "cmdline-tools;latest"
-          echo "y" | sudo $HOME/android/sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "build-tools;34.0.0"
-          echo "y" | sudo $HOME/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-        env:
-          ANDROID_SDK_ROOT: $HOME/android/sdk
-          PATH: ${{ env.PATH }}:/opt/hostedtoolcache/AndroidSDK/cmdline-tools/latest/bin:$HOME/android/sdk/platform-tools
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses
 
       - name: Build APK
         run: |
